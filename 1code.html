@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Cart Assistant - Professional Dashboard</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background: #2c3e50;
+      color: white;
+      padding: 20px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      animation: fadeInDown 1s ease-out;
+    }
+    .sidebar {
+      background: #34495e;
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+      position: fixed;
+      width: 250px;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      transform: translateX(0);
+      transition: transform 0.5s ease;
+    }
+    .sidebar.hide {
+      transform: translateX(-100%);
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .sidebar a:hover {
+      background: #3498db;
+      transform: translateX(10px);
+    }
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+    }
+    .dashboard-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      animation: fadeInUp 1s ease-out;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+    .section-title {
+      font-weight: 500;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      animation: fadeInLeft 1s ease-out;
+    }
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      animation: fadeInUp 1s ease-out;
+    }
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    .rating {
+      color: #f39c12;
+    }
+
+    /* Optional: your own chatbot container (NOT used by Watson, but kept if you want later) */
+    .chatbot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 350px;
+      height: 450px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    .chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1001;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: background 0.3s, transform 0.3s;
+      animation: bounceIn 1s ease-out;
+    }
+    .chat-toggle:hover {
+      background: #2980b9;
+      transform: scale(1.1);
+    }
+    .footer {
+      background: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      margin-left: 250px;
+      animation: fadeInUp 1s ease-out;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      .main-content {
+        margin-left: 0;
+      }
+      .footer {
+        margin-left: 0;
+      }
+    }
+    /* Staggered animation for rows */
+    .row > .col-md-3:nth-child(1) { animation-delay: 0.1s; }
+    .row > .col-md-3:nth-child(2) { animation-delay: 0.2s; }
+    .row > .col-md-3:nth-child(3) { animation-delay: 0.3s; }
+    .row > .col-md-3:nth-child(4) { animation-delay: 0.4s; }
+    .row > .col-md-6:nth-child(1) { animation-delay: 0.1s; }
+    .row > .col-md-6:nth-child(2) { animation-delay: 0.2s; }
+    .row > .col-md-4:nth-child(1) { animation-delay: 0.1s; }
+    .row > .col-md-4:nth-child(2) { animation-delay: 0.2s; }
+    .row > .col-md-4:nth-child(3) { animation-delay: 0.3s; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="h4 mb-0">
+          <i class="fas fa-shopping-cart"></i> Smart Cart Assistant
+        </h1>
+        <button class="btn btn-outline-light d-md-none" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <nav class="sidebar animate__animated animate__slideInLeft" id="sidebar">
+    <h5 class="mb-4">Navigation</h5>
+    <a href="#dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="#categories"><i class="fas fa-tags"></i> Categories</a>
+    <a href="#orders"><i class="fas fa-truck"></i> Order Status</a>
+    <a href="#payments"><i class="fas fa-credit-card"></i> Payments</a>
+    <a href="#ratings"><i class="fas fa-star"></i> Ratings</a>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Dashboard Overview -->
+    <section id="dashboard" class="animate__animated animate__fadeIn">
+      <h2 class="section-title"><i class="fas fa-chart-line"></i> Dashboard Overview</h2>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="dashboard-card text-center">
+            <i class="fas fa-shopping-bag fa-3x text-primary"></i>
+            <h4>12</h4>
+            <p>Total Orders</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="dashboard-card text-center">
+            <i class="fas fa-clock fa-3x text-warning"></i>
+            <h4>3</h4>
+            <p>Pending Orders</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="dashboard-card text-center">
+            <i class="fas fa-dollar-sign fa-3x text-success"></i>
+            <h4>$1,250</h4>
+            <p>Total Spent</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="dashboard-card text-center">
+            <i class="fas fa-star fa-3x text-warning"></i>
+            <h4>4.8</h4>
+            <p>Average Rating</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Categories -->
+    <section id="categories" class="animate__animated animate__fadeInUp">
+      <h2 class="section-title"><i class="fas fa-tags"></i> Product Categories</h2>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=300&h=200&fit=crop" class="card-img-top" alt="Electronics">
+            <div class="card-body">
+              <h5 class="card-title">Electronics</h5>
+              <p class="card-text">Discover the latest gadgets and tech.</p>
+              <a href="#" class="btn btn-primary">Explore</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=300&h=200&fit=crop" class="card-img-top" alt="Clothing">
+            <div class="card-body">
+              <h5 class="card-title">Clothing</h5>
+              <p class="card-text">Trendy fashion for every occasion.</p>
+              <a href="#" class="btn btn-primary">Explore</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=200&fit=crop" class="card-img-top" alt="Home">
+            <div class="card-body">
+              <h5 class="card-title">Home & Garden</h5>
+              <p class="card-text">Essentials to beautify your space.</p>
+              <a href="#" class="btn btn-primary">Explore</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=200&fit=crop" class="card-img-top" alt="Books">
+            <div class="card-body">
+              <h5 class="card-title">Books</h5>
+              <p class="card-text">Expand your knowledge and imagination.</p>
+              <a href="#" class="btn btn-primary">Explore</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Order Status -->
+    <section id="orders" class="animate__animated animate__fadeInUp">
+      <h2 class="section-title"><i class="fas fa-truck"></i> Order Status</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Order #12345</h5>
+              <p class="card-text">Status: <span class="badge bg-warning">Pending</span></p>
+              <p>Items: Laptop, Mouse</p>
+              <p>Estimated Delivery: 3 days</p>
+              <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderModal1">View Details</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Order #12346</h5>
+              <p class="card-text">Status: <span class="badge bg-success">Shipped</span></p>
+              <p>Items: Shirt, Jeans</p>
+              <p>Estimated Delivery: 1 day</p>
+              <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderModal2">View Details</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Payment Methods -->
+    <section id="payments" class="animate__animated animate__fadeInUp">
+      <h2 class="section-title"><i class="fas fa-credit-card"></i> Payment Methods</h2>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <i class="fas fa-credit-card fa-3x text-primary"></i>
+              <h5 class="card-title">Credit Card</h5>
+              <p class="card-text">Secure and instant payments.</p>
+              <button class="btn btn-primary">Select Method</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <i class="fab fa-paypal fa-3x text-primary"></i>
+              <h5 class="card-title">PayPal</h5>
+              <p class="card-text">Trusted global transfers.</p>
+              <button class="btn btn-primary">Select Method</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <i class="fas fa-mobile-alt fa-3x text-primary"></i>
+              <h5 class="card-title">Mobile Wallet</h5>
+              <p class="card-text">Convenient on-the-go payments.</p>
+              <button class="btn btn-primary">Select Method</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ratings -->
+    <section id="ratings" class="animate__animated animate__fadeInUp">
+      <h2 class="section-title"><i class="fas fa-star"></i> User Ratings</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">John Doe</h5>
+              <div class="rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+              </div>
+              <p class="card-text">"Exceptional service and quick delivery. Highly recommend!"</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Jane Smith</h5>
+              <div class="rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+              </div>
+              <p class="card-text">"The chatbot made shopping so easy. Love it!"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="mb-0">&copy; 2025 Smart Cart Assistant. All rights reserved.</p>
+  </footer>
+
+  <!-- Modals for Order Details -->
+  <div class="modal fade" id="orderModal1" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Order #12345 Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Items: Laptop ($999), Mouse ($25)</p>
+          <p>Total: $1024</p>
+          <p>Status: Pending</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="orderModal2" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Order #12346 Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Items: Shirt ($30), Jeans ($40)</p>
+          <p>Total: $70</p>
+          <p>Status: Shipped</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (for modals, etc.) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Sidebar toggle script -->
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('show');
+    }
+  </script>
+
+  <!-- IBM Watson Assistant Web Chat -->
+  <script>
+    window.watsonAssistantChatOptions = {
+      integrationID: "d3c81bc8-78ba-4428-a6c2-4a2e84cdf29a", // The ID of this integration.
+      region: "au-syd", // The region your integration is hosted in.
+      serviceInstanceID: "eb250151-75da-44aa-87c8-51d68d86a25f", // The ID of your service instance.
+      onLoad: async (instance) => { await instance.render(); }
+    };
+
+    setTimeout(function() {
+      const t = document.createElement('script');
+      t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/versions/"
+              + (window.watsonAssistantChatOptions.clientVersion || 'latest')
+              + "/WatsonAssistantChatEntry.js";
+      document.head.appendChild(t);
+    });
+  </script>
+</body>
+</html>
